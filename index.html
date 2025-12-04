@@ -2,19 +2,26 @@
 <html>
 <head>
 <style>
-    body {
+    html, body {
         margin: 0;
-        height: 100vh;
+        height: 100%;
+        overflow: hidden;
+        background-color: black; /* fills empty space */
+    }
 
-        /* background image settings */
-        background-image: url("BG.png");
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: contain; /* show entire image */
-        background-color: black;  /* fills space if aspect ratio differs */
+    .bg-img {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
     }
 </style>
 </head>
 <body>
+    <img class="bg-img" src="BG.png">
 </body>
 </html>
