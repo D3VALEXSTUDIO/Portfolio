@@ -1,24 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Full Background Image</title>
-
 <style>
     body {
         margin: 0;
-        padding: 0;
         height: 100vh;
-        background-image: url("BG.png"); 
-        background-size: cover;      
-        background-position: center;  
-        background-repeat: no-repeat; 
-        background-attachment: fixed; 
+        background: url("BG.png") no-repeat center center;
+        background-size: contain; /* keeps 16:9 ratio */
+        background-color: black;  /* behind the image */
     }
 </style>
 </head>
-
 <body>
 </body>
 </html>
