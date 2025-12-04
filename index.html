@@ -5,9 +5,13 @@
     body {
         margin: 0;
         height: 100vh;
-        background: url("BG.png") no-repeat center center;
-        background-size: contain; /* keeps 16:9 ratio */
-        background-color: black;  /* behind the image */
+
+        /* background image settings */
+        background-image: url("BG.png");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain; /* show entire image */
+        background-color: black;  /* fills space if aspect ratio differs */
     }
 </style>
 </head>
