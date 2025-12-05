@@ -121,7 +121,7 @@
 
       const p = document.createElement('span');
       p.className = 'prompt';
-      p.textContent = 'sonny-bolton@portfolio:~$';
+      p.textContent = 'SonnyBolton@portfolio:~$';
 
       const input = document.createElement('input');
       input.className = 'cmd';
@@ -178,7 +178,7 @@
 
     function processCommand(raw){
       const cmdRaw = raw || '';
-      appendLine('user@portfolio:~$ ' + cmdRaw, 'small');
+      appendLine('SonnyBolton@portfolio:~$ ' + cmdRaw, 'small');
 
       const parts = cmdRaw.split(/\s+/).filter(Boolean);
       const base = parts[0] ? parts[0].toLowerCase() : '';
