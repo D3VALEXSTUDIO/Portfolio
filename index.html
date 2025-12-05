@@ -9,223 +9,248 @@
       --bg: #0b0b0b;
       --text: #33ff33;
       --muted: #8cff8c;
-      --panel-width: 920px; /* change to desired width */
-      --left-padding: 24px; /* how far from left edge */
+      --left-padding: 24px;
+      --panel-width: 920px;
     }
 
-    html,body{height:100%; margin:0; background:var(--bg); color:var(--text); font-family: "Courier New", monospace;}
-    body{font-size:18px; -webkit-font-smoothing:antialiased; overflow:auto; padding-top:18px;}
+    html,body{
+      margin:0;
+      height:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family:"Courier New", monospace;
+    }
 
-    /* Terminal container aligned to the left of the viewport */
-    .terminal {
-      width: var(--panel-width);
-      max-width: calc(100% - var(--left-padding));
-      margin: 0;               /* left-aligned (top-left of page) */
-      margin-left: var(--left-padding);
-      white-space: pre-wrap;
+    body{
+      padding-top:20px;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    .terminal{
+      width:var(--panel-width);
+      max-width:calc(100% - var(--left-padding));
+      margin-left:var(--left-padding);
+      white-space:pre-wrap;
       line-height:1.45;
     }
 
-    .line { margin-bottom: 6px; }
-    .prompt { color: var(--muted); margin-right: 10px; display:inline-block; width:200px; /* fixed prompt column */ }
-    .input-line { display:flex; align-items:center; gap:8px; }
-
-    /* Input styled like terminal: transparent background, caret preserved */
-    input.cmd {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font: inherit;
-      width: calc(100% - 220px); /* fill remaining width after prompt */
-      min-width: 180px;
-      caret-color: var(--text);
+    .line{
+      margin-bottom:6px;
     }
 
-    /* Make typed intro text look like terminal output */
-    .section-title { font-weight:700; color:var(--muted); margin-top:8px; }
-    .small { font-size:0.92em; color:#9aff9a; }
-    a{ color:var(--text); text-decoration:underline; }
-    @media (max-width:700px){
-      .prompt{ width:140px; }
-      input.cmd{ width: calc(100% - 160px); }
-      .terminal{ margin-left:12px; padding-right:12px; }
+    /* --- FIXED PROMPT + INPUT SYSTEM --- */
+    .input-line{
+      display:flex;
+      align-items:center;
+      width:100%;
+    }
+
+    .prompt{
+      white-space:nowrap;
+      margin-right:10px;
+      color:var(--muted);
+    }
+
+    input.cmd{
+      flex:1;
+      min-width:0;
+      background:transparent;
+      border:none;
+      outline:none;
+      color:var(--text);
+      font:inherit;
+      caret-color:var(--text);
+    }
+
+    .section-title{
+      font-weight:700;
+      color:var(--muted);
+      margin-top:8px;
+    }
+
+    .small{
+      font-size:0.92em;
+      color:#9aff9a;
+    }
+
+    @media(max-width:700px){
+      .terminal{
+        margin-left:12px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="terminal" id="terminal" role="application" aria-label="Portfolio terminal"></div>
+  <div class="terminal" id="terminal"></div>
 
-  <script>
-    const terminal = document.getElementById('terminal');
+<script>
+  const terminal = document.getElementById("terminal");
 
-    const SKILLS = {
-      technical: [
-        "Unreal Engine","Unity","C++ / C#","Gameplay Programming","Level Design",
-        "Animation Blueprints","Python","Web Programming","Software Programming","Godot",
-        "Multiplayer Systems","Debugging","Cross-Platform Development","UI Design","Art & Animation",
-        "Game Design Principles"
-      ],
-      software: [
-        "Blender / 3DS Max (3D Modelling)","JavaScript","Microsoft PowerPoint","Microsoft Excel",
-        "Microsoft Teams","Trello Boards (Project Management)","Video Editing","Sound Design"
-      ],
-      soft: [
-        "Teamwork","Teaching Coding","Project Management","Playtesting","Team Collaboration",
-        "Design Docs","Risk Assessments","Problem-Solving","Creativity","Adaptability",
-        "Verbal Communication","Written Communication","Presentation Skills","Leadership",
-        "Multi-Tasking","Digital Communication","Basic IT Literacy","Planning & Organization",
-        "Goal Setting","Attention to Detail","Networking","Empathy","Interpersonal Skills",
-        "Decision-Making","Critical Thinking"
-      ]
-    };
+  const SKILLS = {
+    technical: [
+      "Unreal Engine","Unity","C++ / C#","Gameplay Programming","Level Design",
+      "Animation Blueprints","Python","Web Programming","Software Programming","Godot",
+      "Multiplayer Systems","Debugging","Cross-Platform Development","UI Design",
+      "Art & Animation","Game Design Principles"
+    ],
+    software: [
+      "Blender / 3DS Max","JavaScript","Microsoft PowerPoint",
+      "Microsoft Excel","Microsoft Teams","Trello (Project Management)",
+      "Video Editing","Sound Design"
+    ],
+    soft: [
+      "Teamwork","Teaching Coding","Project Management","Playtesting",
+      "Team Collaboration","Design Docs","Risk Assessments","Problem-Solving",
+      "Creativity","Adaptability","Verbal Communication","Written Communication",
+      "Presentation Skills","Leadership","Multi-Tasking","Digital Communication",
+      "Basic IT Literacy","Planning & Organization","Goal Setting",
+      "Attention to Detail","Networking","Empathy","Interpersonal Skills",
+      "Decision-Making","Critical Thinking"
+    ]
+  };
 
-    /* Basic helpers */
-    function appendLine(text = '', className = 'line'){
-      const el = document.createElement('div');
-      el.className = className;
-      el.textContent = text;
+  function appendLine(text="", cls="line"){
+    const el=document.createElement("div");
+    el.className=cls;
+    el.textContent=text;
+    terminal.appendChild(el);
+    window.scrollTo(0, document.body.scrollHeight);
+    return el;
+  }
+
+  function appendElement(node){
+    terminal.appendChild(node);
+    window.scrollTo(0, document.body.scrollHeight);
+    return node;
+  }
+
+  function typeText(text, speed=20){
+    return new Promise(resolve=>{
+      const el=document.createElement("div");
+      el.className="line";
       terminal.appendChild(el);
-      window.scrollTo(0, document.body.scrollHeight);
-      return el;
-    }
-    function appendElement(node){
-      terminal.appendChild(node);
-      window.scrollTo(0, document.body.scrollHeight);
-      return node;
-    }
 
-    /* Typewriter for intro lines */
-    function typeText(text, speed = 20){
-      return new Promise(resolve => {
-        const container = document.createElement('div');
-        container.className = 'line';
-        terminal.appendChild(container);
-        let i = 0;
-        const t = setInterval(()=>{
-          container.textContent += text.charAt(i);
-          i++;
-          if(i >= text.length){
-            clearInterval(t);
-            appendLine('', 'line');
-            resolve();
-          }
-        }, speed);
-      });
-    }
-
-    /* Prompt creation: prompt + real input element (native caret used) */
-    function makePrompt(){
-      const row = document.createElement('div');
-      row.className = 'input-line';
-
-      const p = document.createElement('span');
-      p.className = 'prompt';
-      p.textContent = 'SonnyBolton@portfolio:~$';
-
-      const input = document.createElement('input');
-      input.className = 'cmd';
-      input.autocomplete = 'off';
-      input.spellcheck = false;
-      input.setAttribute('aria-label','Terminal command input');
-
-      row.appendChild(p);
-      row.appendChild(input);
-      appendElement(row);
-
-      // ensure the input receives focus and caret is visible
-      input.focus();
-      // place caret at the end if anything prefilled (none here)
-      input.setSelectionRange(input.value.length, input.value.length);
-
-      // handle Enter and Ctrl+C
-      input.addEventListener('keydown', (e)=>{
-        if(e.key === 'Enter'){
-          const cmd = input.value.trim();
-          input.disabled = true;
-          processCommand(cmd);
-        } else if(e.key === 'c' && e.ctrlKey){
-          // simulate ^C behavior
-          appendLine('^C');
-          input.disabled = true;
-          makePrompt();
+      let i=0;
+      const t=setInterval(()=>{
+        el.textContent += text.charAt(i);
+        i++;
+        if(i>=text.length){
+          clearInterval(t);
+          appendLine();
+          resolve();
         }
-      });
-    }
+      }, speed);
+    });
+  }
 
-    function formatList(arr){ return arr.join(', '); }
+  function makePrompt(){
+    const row=document.createElement('div');
+    row.className='input-line';
 
-    function showAllSkills(){
-      appendLine('--- Technical Skills ---', 'section-title');
-      appendLine(formatList(SKILLS.technical));
-      appendLine('');
-      appendLine('--- Software & Tools ---', 'section-title');
-      appendLine(formatList(SKILLS.software));
-      appendLine('');
-      appendLine('--- Soft Skills ---', 'section-title');
-      appendLine(formatList(SKILLS.soft));
-    }
+    const p=document.createElement('span');
+    p.className='prompt';
+    p.textContent='user@portfolio:~$';
 
-    function showSkillSection(section){
-      const key = section.toLowerCase();
-      if(!SKILLS[key]){
-        appendLine('Unknown skills section: ' + section);
-        return;
+    const input=document.createElement('input');
+    input.className='cmd';
+    input.autocomplete='off';
+    input.spellcheck=false;
+
+    row.appendChild(p);
+    row.appendChild(input);
+    appendElement(row);
+
+    input.focus();
+
+    input.addEventListener("keydown", e=>{
+      if(e.key === "Enter"){
+        const cmd=input.value.trim();
+        input.disabled=true;
+        processCommand(cmd);
       }
-      appendLine('--- ' + key.charAt(0).toUpperCase() + key.slice(1) + ' Skills ---', 'section-title');
-      appendLine(formatList(SKILLS[key]));
+      if(e.key==="c" && e.ctrlKey){
+        appendLine("^C");
+        input.disabled=true;
+        makePrompt();
+      }
+    });
+  }
+
+  function formatList(arr){
+    return arr.join(", ");
+  }
+
+  function showAllSkills(){
+    appendLine("--- Technical Skills ---","section-title");
+    appendLine(formatList(SKILLS.technical));
+
+    appendLine();
+    appendLine("--- Software & Tools ---","section-title");
+    appendLine(formatList(SKILLS.software));
+
+    appendLine();
+    appendLine("--- Soft Skills ---","section-title");
+    appendLine(formatList(SKILLS.soft));
+  }
+
+  function showSkillSection(sec){
+    const key=sec.toLowerCase();
+    if(!SKILLS[key]){
+      appendLine("Unknown skill section: "+sec);
+      return;
+    }
+    appendLine("--- "+sec.charAt(0).toUpperCase()+sec.slice(1)+" Skills ---","section-title");
+    appendLine(formatList(SKILLS[key]));
+  }
+
+  function processCommand(raw){
+    appendLine("user@portfolio:~$ "+raw,"small");
+
+    const parts=raw.split(/\s+/).filter(Boolean);
+    const cmd=parts[0] ? parts[0].toLowerCase() : "";
+
+    switch(cmd){
+      case "":
+        break;
+      case "help":
+        appendLine("Commands: help, skills, skills [technical/software/soft], projects, contact, clear");
+        break;
+      case "skills":
+        if(parts.length===1) showAllSkills();
+        else showSkillSection(parts[1]);
+        break;
+      case "projects":
+        appendLine("Projects:");
+        appendLine("- Portfolio Website");
+        appendLine("- CLI App");
+        appendLine("- Game Prototype");
+        break;
+      case "contact":
+        appendLine("Email: your.email@example.com");
+        break;
+      case "clear":
+        terminal.innerHTML="";
+        break;
+      default:
+        appendLine("Command not found: "+raw);
     }
 
-    function processCommand(raw){
-      const cmdRaw = raw || '';
-      appendLine('SonnyBolton@portfolio:~$ ' + cmdRaw, 'small');
-
-      const parts = cmdRaw.split(/\s+/).filter(Boolean);
-      const base = parts[0] ? parts[0].toLowerCase() : '';
-
-      switch(base){
-        case '':
-          // empty input: just show a new prompt
-          break;
-        case 'help':
-          appendLine("Commands: help, skills, skills technical, skills software, skills soft, projects, contact, clear");
-          break;
-        case 'skills':
-          if(parts.length === 1) showAllSkills();
-          else showSkillSection(parts[1]);
-          break;
-        case 'projects':
-          appendLine("Projects:\n- Portfolio Website\n- CLI App\n- Game Prototype");
-          break;
-        case 'contact':
-          appendLine("Email: sonnyjcb2006@hotmail.com");
-          break;
-        case 'clear':
-          terminal.innerHTML = '';
-          break;
-        default:
-          appendLine('Command not found: ' + cmdRaw);
-      }
-
-      if(base !== 'clear') {
-        // tiny delay to keep feel of terminal
-        setTimeout(()=> makePrompt(), 60);
-      } else {
-        // after clear, bring back a fresh prompt
-        setTimeout(()=> makePrompt(), 40);
-      }
+    if(cmd==="clear"){
+      setTimeout(()=>makePrompt(),50);
+    } else {
+      setTimeout(()=>makePrompt(),80);
     }
+  }
 
-    /* Startup */
-    (async function init(){
-      await typeText('Initializing portfolio system...');
-      await typeText('Loading modules: [skills, projects, contact]');
-      await typeText('System ready.');
-      appendLine('');
-      appendLine("Type 'help' to see available commands.", 'small');
-      appendLine('');
-      makePrompt();
-    })();
-  </script>
+  (async function init(){
+    await typeText("Initializing portfolio system...");
+    await typeText("Loading modules: [skills, projects, contact]");
+    await typeText("System ready.");
+    appendLine();
+    appendLine("Type 'help' to see available commands.","small");
+    appendLine();
+    makePrompt();
+  })();
+</script>
 </body>
 </html>
