@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Terminal Portfolio</title>
+  <title>Sonny Bolton Portfolio</title>
   <style>
     :root{
       --bg: #0b0b0b;
@@ -149,7 +149,7 @@
 
     const p=document.createElement('span');
     p.className='prompt';
-    p.textContent='user@portfolio:~$';
+    p.textContent='SonnyBolton@portfolio:~$';
 
     const input=document.createElement('input');
     input.className='cmd';
@@ -204,7 +204,7 @@
   }
 
   function processCommand(raw){
-    appendLine("user@portfolio:~$ "+raw,"small");
+    appendLine("SonnyBolton@portfolio:~$ "+raw,"small");
 
     const parts=raw.split(/\s+/).filter(Boolean);
     const cmd=parts[0] ? parts[0].toLowerCase() : "";
@@ -226,7 +226,7 @@
         appendLine("- Game Prototype");
         break;
       case "contact":
-        appendLine("Email: your.email@example.com");
+        appendLine("Email: sonnyjcb2006@hotmail.com");
         break;
       case "clear":
         terminal.innerHTML="";
