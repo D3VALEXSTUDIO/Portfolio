@@ -1,135 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sonny Bolton Portfolio </title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sonny Bolton Portfolio</title>
+
   <style>
+    :root {
+      --bg: #0b0b0b;
+      --text: #33ff33;
+      --muted: #8cff8c;
+    }
+
     body {
       margin: 0;
-      background: #0d0d0d;
-      color: #33ff33;
+      background: var(--bg);
+      color: var(--text);
       font-family: "Courier New", monospace;
       font-size: 18px;
-      overflow: hidden;
+      padding: 24px;
+      overflow-x: hidden;
     }
+
     .terminal {
-      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
       white-space: pre-wrap;
+      line-height: 1.45;
     }
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      background: #33ff33;
-      animation: blink 0.8s infinite;
-    }
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-    .input-line {
-      display: flex;
-    }
-    .prompt {
-      margin-right: 8px;
-    }
-    input {
+
+    .line { margin-bottom: 6px; }
+    .prompt { color: var(--muted); margin-right: 8px; }
+    .input-line { display: flex; align-items: center; }
+
+    input.cmd {
       background: transparent;
       border: none;
       outline: none;
-      color: #33ff33;
-      font-family: inherit;
-      font-size: inherit;
-      flex: 1;
+      color: var(--text);
+      font: inherit;
+      width: 100%;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1.1em;
+      background: var(--text);
+      margin-left: 6px;
+      animation: blink 900ms steps(1) infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .section-title {
+      font-weight: bold;
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 0.9em;
+      color: #9aff9a;
     }
   </style>
 </head>
+
 <body>
   <div class="terminal" id="terminal"></div>
+
   <script>
     const terminal = document.getElementById("terminal");
 
-    const introLines = [
-      "Initializing portfolio system...",
-      "Loading modules: [skills, projects, contact]",
-      "System ready.",
-      "\nType 'help' to see available commands.\n"
-    ];
+    // -----------------------------
+    // SKILL DATA
+    // -----------------------------
 
-    let lineIndex = 0;
+    const SKILLS = {
+      technical: [
+        "Unreal Engine",
+        "Unity",
+        "C++ / C#",
+        "Gameplay Programming",
+        "Level Design",
+        "Animation Blueprints",
+        "Python",
+        "Web Programming",
+        "Software Programming",
+        "Godot",
+        "Multiplayer Systems",
+        "Debugging",
+        "Cross-Platform Development",
+        "UI Design",
+        "Art & Animation",
+        "Game Design Principles"
+      ],
 
-    function typeLine(text, callback) {
-      let i = 0;
-      const interval = setInterval(() => {
-        terminal.innerHTML += text[i];
-        i++;
-        if (i === text.length) {
-          clearInterval(interval);
-          terminal.innerHTML += "\n";
-          callback();
-        }
-      }, 30);
+      software: [
+        "Blender / 3DS Max (3D Modelling)",
+        "JavaScript",
+        "Microsoft PowerPoint",
+        "Microsoft Excel",
+        "Microsoft Teams",
+        "Trello Boards (Project Management)",
+        "Video Editing",
+        "Sound Design"
+      ],
+
+      soft: [
+        "Teamwork",
+        "Teaching Coding",
+        "Project Management",
+        "Playtesting",
+        "Team Collaboration",
+        "Design Docs",
+        "Risk Assessments",
+        "Problem-Solving",
+        "Creativity",
+        "Adaptability",
+        "Verbal Communication",
+        "Written Communication",
+        "Presentation Skills",
+        "Leadership",
+        "Multi-Tasking",
+        "Digital Communication",
+        "Basic IT Literacy",
+        "Planning & Organization",
+        "Goal Setting",
+        "Attention to Detail",
+        "Networking",
+        "Empathy",
+        "Interpersonal Skills",
+        "Decision-Making",
+        "Critical Thinking"
+      ]
+    };
+
+    // -----------------------------
+    // UTILITIES
+    // -----------------------------
+
+    function appendLine(text = "", className = "line") {
+      const el = document.createElement("div");
+      el.className = className;
+      el.textContent = text;
+      terminal.appendChild(el);
+      window.scrollTo(0, document.body.scrollHeight);
+      return el;
     }
 
-    function runIntro() {
-      if (lineIndex < introLines.length) {
-        typeLine(introLines[lineIndex], runIntro);
-        lineIndex++;
-      } else {
-        showInput();
-      }
+    function appendElement(el) {
+      terminal.appendChild(el);
+      window.scrollTo(0, document.body.scrollHeight);
+      return el;
     }
 
-    function showInput() {
-      const inputLine = document.createElement("div");
-      inputLine.className = "input-line";
+    function typeText(text, speed = 25) {
+      return new Promise(resolve => {
+        const container = appendLine("");
+        let i = 0;
+
+        const interval = setInterval(() => {
+          container.textContent += text[i];
+          i++;
+
+          if (i >= text.length) {
+            clearInterval(interval);
+            appendLine("");
+            resolve();
+          }
+        }, speed);
+      });
+    }
+
+    // -----------------------------
+    // COMMAND SYSTEM
+    // -----------------------------
+
+    function makePrompt() {
+      const row = document.createElement("div");
+      row.className = "input-line";
 
       const prompt = document.createElement("span");
       prompt.className = "prompt";
-      prompt.textContent = "Sonny Bolton@portfolio:~$";
+      prompt.textContent = "user@portfolio:~$";
 
       const input = document.createElement("input");
-      input.autofocus = true;
+      input.className = "cmd";
+      input.autocomplete = "off";
 
-      inputLine.appendChild(prompt);
-      inputLine.appendChild(input);
-      terminal.appendChild(inputLine);
+      const cursor = document.createElement("span");
+      cursor.className = "cursor";
+
+      row.appendChild(prompt);
+      row.appendChild(input);
+      row.appendChild(cursor);
+
+      appendElement(row);
       input.focus();
 
-      input.addEventListener("keydown", function (e) {
+      input.addEventListener("keydown", e => {
         if (e.key === "Enter") {
           const command = input.value.trim();
-          processCommand(command);
           input.disabled = true;
+          cursor.remove();
+          processCommand(command);
         }
       });
     }
 
-    function processCommand(cmd) {
-      const responses = {
-        help: "Commands: skills, projects, contact, clear",
-        skills: "Technical Skills: Unreal Engine, Unity, C++ / C#, Gameplay Programming, Level Design, Animation Blueprints, Python, Web Programming, Software Programming, Godot, Multiplayer Systems, Debugging, Cross-Platform Development, UI Design, Art & Animation, Game Design Principles.
-
-Software Tools: Blender / 3DS Max, JavaScript, Microsoft PowerPoint, Microsoft Excel, Microsoft Teams, Trello Boards, Video Editing, Sound Design.
-
-Soft Skills: Teamwork, Teaching Coding, Project Management, Playtesting, Team Collaboration, Design Docs, Risk Assessments, Problem-Solving, Creativity, Adaptability, Verbal Communication, Written Communication, Presentation Skills, Leadership, Multi-Tasking, Digital Communication, Basic IT Literacy, Planning & Organization, Goal Setting, Attention to Detail, Networking, Empathy, Interpersonal Skills, Decision-Making, Critical Thinking.",
-        projects: "Projects: Portfolio Website, CLI App, Game Prototype",
-        contact: "Email: your.email@example.com",
-      };
-
-      const response = responses[cmd] || `Command not found: ${cmd}`;
-
-      terminal.innerHTML += `\n${response}\n`;
-
-      if (cmd === "clear") {
-        terminal.innerHTML = "";
-      }
-
-      showInput();
+    function formatList(arr) {
+      return arr.join(", ");
     }
 
-    runIntro();
+    function showAllSkills() {
+      appendLine("--- Technical Skills ---", "section-title");
+      appendLine(formatList(SKILLS.technical));
+      appendLine("");
+
+      appendLine("--- Software & Tools ---", "section-title");
+      appendLine(formatList(SKILLS.software));
+      appendLine("");
+
+      appendLine("--- Soft Skills ---", "section-title");
+      appendLine(formatList(SKILLS.soft));
+      appendLine("");
+    }
+
+    function showSkillSection(section) {
+      const key = section.toLowerCase();
+      if (!SKILLS[key]) {
+        appendLine("Unknown skills section: " + section);
+        return;
+      }
+
+      const title =
+        key.charAt(0).toUpperCase() + key.slice(1) + " Skills";
+
+      appendLine("--- " + title + " ---", "section-title");
+      appendLine(formatList(SKILLS[key]));
+      appendLine("");
+    }
+
+    function processCommand(command) {
+      appendLine("Sonny-Bolton@portfolio:~$ " + command, "small");
+
+      const parts = command.split(" ");
+      const cmd = parts[0].toLowerCase();
+
+      switch (cmd) {
+        case "help":
+          appendLine(
+            "Commands: help, skills, skills technical, skills software, skills soft, projects, contact, clear"
+          );
+          break;
+
+        case "skills":
+          if (parts.length === 1) showAllSkills();
+          else showSkillSection(parts[1]);
+          break;
+
+        case "projects":
+          appendLine("Projects:\n- Portfolio Website\n- CLI App\n- Game Prototype");
+          break;
+
+        case "contact":
+          appendLine("Email: sonnyjcb2006@hotmail.com");
+          break;
+
+        case "clear":
+          terminal.innerHTML = "";
+          break;
+
+        default:
+          appendLine("Command not found: " + command);
+      }
+
+      if (cmd !== "clear") makePrompt();
+    }
+
+    // -----------------------------
+    // INIT
+    // -----------------------------
+
+    async function init() {
+      await typeText("Initializing portfolio system...");
+      await typeText("Loading modules: [skills, projects, contact]");
+      await typeText("System ready.");
+
+      appendLine("");
+      appendLine("Type 'help' to see available commands.", "small");
+      appendLine("");
+
+      makePrompt();
+    }
+
+    init();
   </script>
 </body>
 </html>
