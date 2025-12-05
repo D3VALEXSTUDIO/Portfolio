@@ -213,7 +213,7 @@
       case "":
         break;
       case "help":
-        appendLine("Commands: help, skills, skills [technical/software/soft], projects, contact, clear");
+        appendLine("Commands: help, skills, skills [technical/software/soft], projects, contact, about-me, clear");
         break;
       case "skills":
         if(parts.length===1) showAllSkills();
@@ -251,7 +251,7 @@
 
   (async function init(){
     await typeText("Initializing portfolio system...");
-    await typeText("Loading modules: [skills, projects, contact]");
+    await typeText("Loading modules: [skills, projects, contact, about-me]");
     await typeText("System ready.");
     appendLine();
     appendLine("Type 'help' to see available commands.","small");
