@@ -1,14 +1,131 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-    html, body {
-        margin: 0;
-        height: 100%;
-        background-color: 222222; /* full black screen */
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Terminal</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0d0d0d;
+      color: #33ff33;
+      font-family: "Courier New", monospace;
+      font-size: 18px;
+      overflow: hidden;
     }
-</style>
+    .terminal {
+      padding: 20px;
+      white-space: pre-wrap;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      background: #33ff33;
+      animation: blink 0.8s infinite;
+    }
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .input-line {
+      display: flex;
+    }
+    .prompt {
+      margin-right: 8px;
+    }
+    input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #33ff33;
+      font-family: inherit;
+      font-size: inherit;
+      flex: 1;
+    }
+  </style>
 </head>
 <body>
+  <div class="terminal" id="terminal"></div>
+  <script>
+    const terminal = document.getElementById("terminal");
+
+    const introLines = [
+      "Initializing portfolio system...",
+      "Loading modules: [skills, projects, contact]",
+      "System ready.",
+      "\nType 'help' to see available commands.\n"
+    ];
+
+    let lineIndex = 0;
+
+    function typeLine(text, callback) {
+      let i = 0;
+      const interval = setInterval(() => {
+        terminal.innerHTML += text[i];
+        i++;
+        if (i === text.length) {
+          clearInterval(interval);
+          terminal.innerHTML += "\n";
+          callback();
+        }
+      }, 30);
+    }
+
+    function runIntro() {
+      if (lineIndex < introLines.length) {
+        typeLine(introLines[lineIndex], runIntro);
+        lineIndex++;
+      } else {
+        showInput();
+      }
+    }
+
+    function showInput() {
+      const inputLine = document.createElement("div");
+      inputLine.className = "input-line";
+
+      const prompt = document.createElement("span");
+      prompt.className = "prompt";
+      prompt.textContent = "user@portfolio:~$";
+
+      const input = document.createElement("input");
+      input.autofocus = true;
+
+      inputLine.appendChild(prompt);
+      inputLine.appendChild(input);
+      terminal.appendChild(inputLine);
+      input.focus();
+
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          const command = input.value.trim();
+          processCommand(command);
+          input.disabled = true;
+        }
+      });
+    }
+
+    function processCommand(cmd) {
+      const responses = {
+        help: "Commands: skills, projects, contact, clear",
+        skills: "Skills: HTML, CSS, JavaScript, React, Node.js, Python",
+        projects: "Projects: Portfolio Website, CLI App, Game Prototype",
+        contact: "Email: your.email@example.com",
+      };
+
+      const response = responses[cmd] || `Command not found: ${cmd}`;
+
+      terminal.innerHTML += `\n${response}\n`;
+
+      if (cmd === "clear") {
+        terminal.innerHTML = "";
+      }
+
+      showInput();
+    }
+
+    runIntro();
+  </script>
 </body>
 </html>
