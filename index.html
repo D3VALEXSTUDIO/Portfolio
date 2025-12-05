@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sonny Bolton Porfolio</title>
+  <title>Sonny Bolton Portfolio </title>
   <style>
     body {
       margin: 0;
@@ -87,7 +87,7 @@
 
       const prompt = document.createElement("span");
       prompt.className = "prompt";
-      prompt.textContent = "Sonny-Bolton@portfolio:~$";
+      prompt.textContent = "Sonny Bolton@portfolio:~$";
 
       const input = document.createElement("input");
       input.autofocus = true;
@@ -109,9 +109,13 @@
     function processCommand(cmd) {
       const responses = {
         help: "Commands: skills, projects, contact, clear",
-        skills: "Skills: Unreal Engine, Unity, C++ / C#, Gameplay Programming, Level Design, Animation Blueprints, Python, Web Programming, Software Programming, Godot, 3D Modelling (Blender / 3DS Max), JavaScript, Teaching Coding, Video Editing, Microsoft PowerPoint, Microsoft Excel, Teamwork, AI Development, Multiplayer Systems, Debugging, Project Management / Trello Boards, Playtesting, Cross-Platform Development, Team Collaboration, Design Docs, Risk Assessments, Sound Design, Problem-Solving, Creativity, Adaptability, Verbal Communication, Written Communication, Presentation Skills, Leadership, Multi-Tasking, Digital Communication, Basic IT Literacy, Planning & Organization, Goal Setting, Attention to Detail, Networking, Empathy, Interpersonal Skills, Decision-Making, Critical Thinking, Microsoft Teams, UI Design, Art & Animation, Game Design Principles",
+        skills: "Technical Skills: Unreal Engine, Unity, C++ / C#, Gameplay Programming, Level Design, Animation Blueprints, Python, Web Programming, Software Programming, Godot, Multiplayer Systems, Debugging, Cross-Platform Development, UI Design, Art & Animation, Game Design Principles.
+
+Software Tools: Blender / 3DS Max, JavaScript, Microsoft PowerPoint, Microsoft Excel, Microsoft Teams, Trello Boards, Video Editing, Sound Design.
+
+Soft Skills: Teamwork, Teaching Coding, Project Management, Playtesting, Team Collaboration, Design Docs, Risk Assessments, Problem-Solving, Creativity, Adaptability, Verbal Communication, Written Communication, Presentation Skills, Leadership, Multi-Tasking, Digital Communication, Basic IT Literacy, Planning & Organization, Goal Setting, Attention to Detail, Networking, Empathy, Interpersonal Skills, Decision-Making, Critical Thinking.",
         projects: "Projects: Portfolio Website, CLI App, Game Prototype",
-        contact: "Email: sonnyjcb2006@hotmail.com",
+        contact: "Email: your.email@example.com",
       };
 
       const response = responses[cmd] || `Command not found: ${cmd}`;
