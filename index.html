@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sonny Bolton Portfolio</title>
+  <title>My Portfolio</title>
   <style>
     :root{
       --bg: #0b0b0b;
@@ -149,7 +149,7 @@
 
     const p=document.createElement('span');
     p.className='prompt';
-    p.textContent='SonnyBolton@portfolio:~$';
+    p.textContent='User@portfolio:~$';
 
     const input=document.createElement('input');
     input.className='cmd';
@@ -204,7 +204,7 @@
   }
 
   function processCommand(raw){
-    appendLine("SonnyBolton@portfolio:~$ "+raw,"small");
+    appendLine("User@portfolio:~$ "+raw,"small");
 
     const parts=raw.split(/\s+/).filter(Boolean);
     const cmd=parts[0] ? parts[0].toLowerCase() : "";
