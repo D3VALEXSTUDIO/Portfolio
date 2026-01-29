@@ -1,111 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>        <!-- HTML -->
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Portfolio</title>
-  <style>
-    :root{
-      --bg: #0b0b0b;
-      --text: #33ff33;
-      --muted: #8cff8c;
-      --left-padding: 24px;
-      --panel-width: 920px;
-    }
-
-    html,body{
-      margin:0;
-      height:100%;
-      background:var(--bg);
-      color:var(--text);
-      font-family:"Courier New", monospace;
-    }
-
-    body{
-      padding-top:20px;
-      -webkit-font-smoothing:antialiased;
-    }
-
-    .terminal{
-      width:var(--panel-width);
-      max-width:calc(100% - var(--left-padding));
-      margin-left:var(--left-padding);
-      white-space:pre-wrap;
-      line-height:1.45;
-    }
-
-    .line{
-      margin-bottom:6px;
-    }
-
-    /* --- FIXED PROMPT + INPUT SYSTEM --- */
-    .input-line{
-      display:flex;
-      align-items:center;
-      width:100%;
-    }
-
-    .prompt{
-      white-space:nowrap;
-      margin-right:10px;
-      color:var(--muted);
-    }
-
-    input.cmd{
-      flex:1;
-      min-width:0;
-      background:transparent;
-      border:none;
-      outline:none;
-      color:var(--text);
-      font:inherit;
-      caret-color:var(--text);
-    }
-
-    .section-title{
-      font-weight:700;
-      color:var(--muted);
-      margin-top:8px;
-    }
-
-    .small{
-      font-size:0.92em;
-      color:#9aff9a;
-    }
-
-    @media(max-width:700px){
-      .terminal{
-        margin-left:12px;
-      }
-    }
-  </style>
+  <style>...</style>   <!-- CSS -->
 </head>
 <body>
-  <div class="terminal" id="terminal"></div>
+  <div id="terminal"></div>  <!-- HTML -->
+
 
 <script>
   const terminal = document.getElementById("terminal");
 
+  /* =======================
+     PROJECT TEMPLATE SYSTEM
+     ======================= */
+  const PROJECTS = {
+    "portfolio-website": {
+      title: "Portfolio Website",
+      content: [
+        "Type: Web Project",
+        "Tech: HTML, CSS, JavaScript",
+        "",
+        "Description:",
+        "A terminal-inspired portfolio that mimics",
+        "a command-line interface for navigation.",
+        "",
+        "Features:",
+        "- Typing animations",
+        "- Modular commands",
+        "- Responsive terminal layout",
+        "- Project pop-up system"
+      ]
+    }
+
+    /* ---- COPY BELOW TO ADD A NEW PROJECT ----
+    ,
+    "project-name": {
+      title: "Project Title",
+      content: [
+        "Type:",
+        "Tech:",
+        "",
+        "Description:",
+        "",
+        "Features:"
+      ]
+    }
+    ------------------------------------------ */
+  };
+
   const SKILLS = {
     technical: [
       "Unreal Engine","Unity","C++ / C#","Gameplay Programming","Level Design",
-      "Animation Blueprints","Python","Web Programming","Software Programming","Godot",
-      "Multiplayer Systems","Debugging","Cross-Platform Development","UI Design",
-      "Art & Animation","Game Design Principles"
+      "Animation Blueprints","Python","Web Programming","Software Programming","Godot"
     ],
     software: [
       "Blender / 3DS Max","JavaScript","Microsoft PowerPoint",
-      "Microsoft Excel","Microsoft Teams","Trello (Project Management)",
-      "Video Editing","Sound Design"
+      "Microsoft Excel","Trello"
     ],
     soft: [
-      "Teamwork","Teaching Coding","Project Management","Playtesting",
-      "Team Collaboration","Design Docs","Risk Assessments","Problem-Solving",
-      "Creativity","Adaptability","Verbal Communication","Written Communication",
-      "Presentation Skills","Leadership","Multi-Tasking","Digital Communication",
-      "Basic IT Literacy","Planning & Organization","Goal Setting",
-      "Attention to Detail","Networking","Empathy","Interpersonal Skills",
-      "Decision-Making","Critical Thinking"
+      "Teamwork","Problem-Solving","Creativity","Leadership"
     ]
   };
 
@@ -143,6 +96,65 @@
     });
   }
 
+  /* =======================
+     TERMINAL POPUP WINDOW
+     ======================= */
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position:fixed; inset:0; background:rgba(0,0,0,.7);
+    display:none; align-items:center; justify-content:center; z-index:999;
+  `;
+
+  const modalWindow = document.createElement("div");
+  modalWindow.style.cssText = `
+    background:#0b0b0b; border:1px solid #33ff33;
+    width:600px; max-width:90%;
+    box-shadow:0 0 20px #1aff1a55;
+  `;
+
+  const modalHeader = document.createElement("div");
+  modalHeader.style.cssText = `
+    background:#111; padding:6px 10px;
+    display:flex; justify-content:space-between;
+    color:#8cff8c; font-size:.9em;
+  `;
+
+  const modalTitle = document.createElement("span");
+  const modalClose = document.createElement("span");
+  modalClose.textContent = "✕";
+  modalClose.style.cursor = "pointer";
+  modalClose.style.color = "#ff5555";
+
+  modalHeader.appendChild(modalTitle);
+  modalHeader.appendChild(modalClose);
+
+  const modalBody = document.createElement("div");
+  modalBody.style.cssText = `
+    padding:14px; white-space:pre-wrap;
+    line-height:1.45; color:#33ff33;
+  `;
+
+  modalWindow.appendChild(modalHeader);
+  modalWindow.appendChild(modalBody);
+  modal.appendChild(modalWindow);
+  document.body.appendChild(modal);
+
+  modalClose.onclick = () => modal.style.display="none";
+  window.addEventListener("keydown", e=>{
+    if(e.key==="Escape") modal.style.display="none";
+  });
+
+  function openProject(key){
+    const p = PROJECTS[key];
+    if(!p){
+      appendLine("Project not found: " + key);
+      return;
+    }
+    modalTitle.textContent = p.title;
+    modalBody.textContent = p.content.join("\n");
+    modal.style.display = "flex";
+  }
+
   function makePrompt(){
     const row=document.createElement('div');
     row.className='input-line';
@@ -153,22 +165,19 @@
 
     const input=document.createElement('input');
     input.className='cmd';
-    input.autocomplete='off';
-    input.spellcheck=false;
 
     row.appendChild(p);
     row.appendChild(input);
     appendElement(row);
-
     input.focus();
 
     input.addEventListener("keydown", e=>{
-      if(e.key === "Enter"){
+      if(e.key==="Enter"){
         const cmd=input.value.trim();
         input.disabled=true;
         processCommand(cmd);
       }
-      if(e.key==="c" && e.ctrlKey){
+      if(e.ctrlKey && e.key==="c"){
         appendLine("^C");
         input.disabled=true;
         makePrompt();
@@ -176,64 +185,35 @@
     });
   }
 
-  function formatList(arr){
-    return arr.join(", ");
-  }
-
-  function showAllSkills(){
-    appendLine("--- Technical Skills ---","section-title");
-    appendLine(formatList(SKILLS.technical));
-
-    appendLine();
-    appendLine("--- Software & Tools ---","section-title");
-    appendLine(formatList(SKILLS.software));
-
-    appendLine();
-    appendLine("--- Soft Skills ---","section-title");
-    appendLine(formatList(SKILLS.soft));
-  }
-
-  function showSkillSection(sec){
-    const key=sec.toLowerCase();
-    if(!SKILLS[key]){
-      appendLine("Unknown skill section: "+sec);
-      return;
-    }
-    appendLine("--- "+sec.charAt(0).toUpperCase()+sec.slice(1)+" Skills ---","section-title");
-    appendLine(formatList(SKILLS[key]));
-  }
-
   function processCommand(raw){
     appendLine("User@portfolio:~$ "+raw,"small");
+    const cmd=raw.toLowerCase();
 
-    const parts=raw.split(/\s+/).filter(Boolean);
-    const cmd=parts[0] ? parts[0].toLowerCase() : "";
+    if(PROJECTS[cmd]){
+      openProject(cmd);
+      makePrompt();
+      return;
+    }
 
     switch(cmd){
-      case "":
-        break;
       case "help":
-        appendLine("Commands: help, skills, skills [technical/software/soft], projects, contact, about-me, clear");
+        appendLine("Commands:");
+        appendLine("help, skills, projects, contact, about-me, clear");
+        appendLine("Type a project name to open it");
         break;
       case "skills":
-        if(parts.length===1) showAllSkills();
-        else showSkillSection(parts[1]);
+        Object.values(SKILLS).flat().forEach(s=>appendLine(s));
         break;
       case "projects":
         appendLine("Projects:");
-        appendLine("- Portfolio Website");
-        appendLine("- CLI App");
-        appendLine("- Game Prototype");
+        Object.keys(PROJECTS).forEach(p=>appendLine("- "+p));
         break;
       case "contact":
         appendLine("Email: d3valexstudios@hotmail.com");
         break;
       case "about-me":
-        appendLine("About Me");
-        appendLine("Hello my name is Sonny Bolton, Im a passionate game developer who specializes in unreal engine,");
-        appendLine("Unity and Gameplay systems. I focus on creating immersive experiences built around creativity,");
-        appendLine("fluid movement, and engaging player interaction.");
-        
+        appendLine("Sonny Bolton — Game Developer");
+        appendLine("Focused on Unreal, Unity, and gameplay systems.");
         break;
       case "clear":
         terminal.innerHTML="";
@@ -241,20 +221,14 @@
       default:
         appendLine("Command not found: "+raw);
     }
-
-    if(cmd==="clear"){
-      setTimeout(()=>makePrompt(),50);
-    } else {
-      setTimeout(()=>makePrompt(),80);
-    }
+    makePrompt();
   }
 
-  (async function init(){
+  (async function(){
     await typeText("Initializing portfolio system...");
-    await typeText("Loading modules: [skills, projects, contact, about-me]");
+    await typeText("Loading modules...");
     await typeText("System ready.");
-    appendLine();
-    appendLine("Type 'help' to see available commands.","small");
+    appendLine("Type 'help' for commands.","small");
     appendLine();
     makePrompt();
   })();
