@@ -68,278 +68,261 @@
 <body>
   <div id="terminal"></div>
 
-  <script>
-    const terminal = document.getElementById("terminal");
+ <script>
+  const terminal = document.getElementById("terminal");
 
-    /* =======================
-       PROJECT TEMPLATE SYSTEM
-       ======================= */
-    const PROJECTS = {
-      "portfolio-website": {
-        title: "Portfolio Website",
-        content: [
-          "Type: Web Project",
-          "Tech: HTML, CSS, JavaScript",
-          "",
-          "Description:",
-          "A terminal-inspired portfolio that mimics",
-          "a command-line interface for navigation.",
-          "",
-          "Features:",
-          "- Typing animations",
-          "- Modular commands",
-          "- Responsive terminal layout",
-          "- Project pop-up system"
-        ]
-      },
-
-       "esports-discordbot": {
-         title: "Discord Bot for an Esports Server",
-         content: [
-           "Type: Discord Bot",
-           "Tech: Python",
-           "",
-           "Description:",
-           "A discord bot used to help automate server welcomes and allowing a way to schedule battles",
-           "and do custom announcements.",
-           "",
-           "Features:",
-           "- 1v1 Battles",
-           "- Points Shop and Redeem",
-           "- Announcments",
-           "- Leaderboards",
-           "- Adding Points"
-        ]
-      }
-    
-      }
-      ------------------------------------------ */
-    };
-
-    const SKILLS = {
-      technical: [
-        "Unreal Engine","Unity","C++ / C#","Gameplay Programming","Level Design",
-        "Animation Blueprints","Python","Web Programming","Software Programming","Godot"
-      ],
-      software: [
-        "Blender / 3DS Max","JavaScript","Microsoft PowerPoint",
-        "Microsoft Excel","Trello"
-      ],
-      soft: [
-        "Teamwork","Problem-Solving","Creativity","Leadership"
+  /* =======================
+     PROJECT TEMPLATE SYSTEM
+     ======================= */
+  const PROJECTS = {
+    "portfolio-website": {
+      title: "Portfolio Website",
+      content: [
+        "Type: Web Project",
+        "Tech: HTML, CSS, JavaScript",
+        "",
+        "Description:",
+        "A terminal-inspired portfolio that mimics",
+        "a command-line interface for navigation.",
+        "",
+        "Features:",
+        "- Typing animations",
+        "- Modular commands",
+        "- Responsive terminal layout",
+        "- Project pop-up system"
       ]
-    };
+    },
 
-    function appendLine(text="", cls="line"){
+    "esports-discordbot": {
+      title: "Discord Bot for an Esports Server",
+      content: [
+        "Type: Discord Bot",
+        "Tech: Python",
+        "",
+        "Description:",
+        "A Discord bot used to automate server welcomes,",
+        "schedule battles, and manage announcements.",
+        "",
+        "Features:",
+        "- 1v1 Battles",
+        "- Points Shop & Redeem",
+        "- Announcements",
+        "- Leaderboards",
+        "- Points System"
+      ]
+    }
+
+    // 👉 COPY ONE PROJECT BLOCK ABOVE TO ADD MORE
+  };
+
+  const SKILLS = {
+    technical: [
+      "Unreal Engine","Unity","C++ / C#","Gameplay Programming","Level Design",
+      "Animation Blueprints","Python","Web Programming","Software Programming","Godot"
+    ],
+    software: [
+      "Blender / 3DS Max","JavaScript","Microsoft PowerPoint",
+      "Microsoft Excel","Trello"
+    ],
+    soft: [
+      "Teamwork","Problem-Solving","Creativity","Leadership"
+    ]
+  };
+
+  function appendLine(text="", cls="line"){
+    const el=document.createElement("div");
+    el.className=cls;
+    el.textContent=text;
+    terminal.appendChild(el);
+    window.scrollTo(0, document.body.scrollHeight);
+    return el;
+  }
+
+  function appendElement(node){
+    terminal.appendChild(node);
+    window.scrollTo(0, document.body.scrollHeight);
+    return node;
+  }
+
+  function typeText(text, speed=20){
+    return new Promise(resolve=>{
       const el=document.createElement("div");
-      el.className=cls;
-      el.textContent=text;
+      el.className="line";
       terminal.appendChild(el);
-      window.scrollTo(0, document.body.scrollHeight);
-      return el;
-    }
 
-    function appendElement(node){
-      terminal.appendChild(node);
-      window.scrollTo(0, document.body.scrollHeight);
-      return node;
-    }
-
-    function typeText(text, speed=20){
-      return new Promise(resolve=>{
-        const el=document.createElement("div");
-        el.className="line";
-        terminal.appendChild(el);
-
-        let i=0;
-        const t=setInterval(()=>{
-          el.textContent += text.charAt(i);
-          i++;
-          if(i>=text.length){
-            clearInterval(t);
-            appendLine();
-            resolve();
-          }
-        }, speed);
-      });
-    }
-
-    /* =======================
-       TERMINAL POPUP WINDOW
-       ======================= */
-
-    // Read theme vars from CSS (so popup matches site)
-    const rootStyles = getComputedStyle(document.documentElement);
-    const BG           = rootStyles.getPropertyValue("--bg").trim() || "#0b0b0b";
-    const ACCENT       = rootStyles.getPropertyValue("--accent").trim() || "#33ff33";
-    const TEXT         = rootStyles.getPropertyValue("--text").trim() || "#caffca";
-    const POPUP_BG     = rootStyles.getPropertyValue("--popup-bg").trim() || BG;
-    const POPUP_HEADER = rootStyles.getPropertyValue("--popup-header").trim() || BG;
-    const POPUP_BORDER = rootStyles.getPropertyValue("--popup-border").trim() || ACCENT;
-    const POPUP_TEXT   = rootStyles.getPropertyValue("--popup-text").trim() || TEXT;
-    const POPUP_TITLE  = rootStyles.getPropertyValue("--popup-title").trim() || TEXT;
-    const POPUP_SHADOW = rootStyles.getPropertyValue("--popup-shadow").trim() || "rgba(51,255,51,.25)";
-
-    const modal = document.createElement("div");
-    modal.style.cssText = `
-      position:fixed; inset:0;
-      background:rgba(0,0,0,.75);
-      display:none; align-items:center; justify-content:center;
-      z-index:999;
-      padding: 18px;
-    `;
-
-    const modalWindow = document.createElement("div");
-    modalWindow.style.cssText = `
-      background:${POPUP_BG};
-      border:1px solid ${POPUP_BORDER};
-      width:600px; max-width:92%;
-      box-shadow:0 0 22px ${POPUP_SHADOW};
-      border-radius:12px;
-      overflow:hidden;
-    `;
-
-    const modalHeader = document.createElement("div");
-    modalHeader.style.cssText = `
-      background:${POPUP_HEADER};
-      padding:8px 12px;
-      display:flex; justify-content:space-between; align-items:center;
-      border-bottom:1px solid color-mix(in srgb, ${ACCENT} 45%, #000 55%);
-      font-size:.92em;
-    `;
-
-    const modalTitle = document.createElement("span");
-    modalTitle.style.cssText = `
-      color:${POPUP_TITLE};
-      letter-spacing:.2px;
-      text-shadow: 0 0 10px color-mix(in srgb, ${ACCENT} 18%, transparent);
-    `;
-
-    const modalClose = document.createElement("span");
-    modalClose.textContent = "✕";
-    modalClose.style.cssText = `
-      cursor:pointer;
-      color: color-mix(in srgb, ${ACCENT} 45%, #ff5555 55%);
-      padding:2px 10px;
-      border-radius:10px;
-      user-select:none;
-    `;
-    modalClose.onmouseenter = () => modalClose.style.background = "rgba(255,255,255,.06)";
-    modalClose.onmouseleave = () => modalClose.style.background = "transparent";
-
-    modalHeader.appendChild(modalTitle);
-    modalHeader.appendChild(modalClose);
-
-    const modalBody = document.createElement("div");
-    modalBody.style.cssText = `
-      padding:14px 14px 16px;
-      white-space:pre-wrap;
-      line-height:1.5;
-      color:${POPUP_TEXT};
-      text-shadow: 0 0 10px color-mix(in srgb, ${ACCENT} 12%, transparent);
-    `;
-
-    modalWindow.appendChild(modalHeader);
-    modalWindow.appendChild(modalBody);
-    modal.appendChild(modalWindow);
-    document.body.appendChild(modal);
-
-    modalClose.onclick = () => modal.style.display="none";
-    modal.onclick = (e) => { if(e.target === modal) modal.style.display="none"; };
-    window.addEventListener("keydown", e=>{
-      if(e.key==="Escape") modal.style.display="none";
+      let i=0;
+      const t=setInterval(()=>{
+        el.textContent += text.charAt(i);
+        i++;
+        if(i>=text.length){
+          clearInterval(t);
+          appendLine();
+          resolve();
+        }
+      }, speed);
     });
+  }
 
-    function openProject(key){
-      const p = PROJECTS[key];
-      if(!p){
-        appendLine("Project not found: " + key);
-        return;
+  /* =======================
+     TERMINAL POPUP WINDOW
+     ======================= */
+
+  const rootStyles = getComputedStyle(document.documentElement);
+  const ACCENT = rootStyles.getPropertyValue("--accent").trim() || "#33ff33";
+  const TEXT = rootStyles.getPropertyValue("--text").trim() || "#caffca";
+
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.75);
+    display:none; align-items:center; justify-content:center;
+    z-index:999;
+    padding:18px;
+  `;
+
+  const modalWindow = document.createElement("div");
+  modalWindow.style.cssText = `
+    background:#0b0b0b;
+    border:1px solid ${ACCENT};
+    width:600px; max-width:92%;
+    box-shadow:0 0 22px rgba(51,255,51,.25);
+    border-radius:12px;
+    overflow:hidden;
+  `;
+
+  const modalHeader = document.createElement("div");
+  modalHeader.style.cssText = `
+    background:#111;
+    padding:8px 12px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:.92em;
+  `;
+
+  const modalTitle = document.createElement("span");
+  modalTitle.style.color = TEXT;
+
+  const modalClose = document.createElement("span");
+  modalClose.textContent = "✕";
+  modalClose.style.cssText = `
+    cursor:pointer;
+    color:#ff6666;
+    padding:2px 10px;
+    border-radius:10px;
+    user-select:none;
+  `;
+
+  modalHeader.appendChild(modalTitle);
+  modalHeader.appendChild(modalClose);
+
+  const modalBody = document.createElement("div");
+  modalBody.style.cssText = `
+    padding:14px;
+    white-space:pre-wrap;
+    line-height:1.5;
+    color:${TEXT};
+  `;
+
+  modalWindow.appendChild(modalHeader);
+  modalWindow.appendChild(modalBody);
+  modal.appendChild(modalWindow);
+  document.body.appendChild(modal);
+
+  modalClose.onclick = () => modal.style.display="none";
+  modal.onclick = e => { if(e.target===modal) modal.style.display="none"; };
+  window.addEventListener("keydown", e=>{
+    if(e.key==="Escape") modal.style.display="none";
+  });
+
+  function openProject(key){
+    const p = PROJECTS[key];
+    if(!p){
+      appendLine("Project not found: " + key);
+      return;
+    }
+    modalTitle.textContent = p.title;
+    modalBody.textContent = p.content.join("\n");
+    modal.style.display = "flex";
+  }
+
+  function makePrompt(){
+    const row=document.createElement('div');
+    row.className='input-line';
+
+    const p=document.createElement('span');
+    p.className='prompt';
+    p.textContent='User@portfolio:~$';
+
+    const input=document.createElement('input');
+    input.className='cmd';
+    input.autocomplete="off";
+    input.spellcheck=false;
+
+    row.appendChild(p);
+    row.appendChild(input);
+    appendElement(row);
+    input.focus();
+
+    input.addEventListener("keydown", e=>{
+      if(e.key==="Enter"){
+        const cmd=input.value.trim();
+        input.disabled=true;
+        processCommand(cmd);
       }
-      modalTitle.textContent = p.title;
-      modalBody.textContent = p.content.join("\n");
-      modal.style.display = "flex";
-    }
-
-    function makePrompt(){
-      const row=document.createElement('div');
-      row.className='input-line';
-
-      const p=document.createElement('span');
-      p.className='prompt';
-      p.textContent='User@portfolio:~$';
-
-      const input=document.createElement('input');
-      input.className='cmd';
-      input.autocomplete = "off";
-      input.spellcheck = false;
-
-      row.appendChild(p);
-      row.appendChild(input);
-      appendElement(row);
-      input.focus();
-
-      input.addEventListener("keydown", e=>{
-        if(e.key==="Enter"){
-          const cmd=input.value.trim();
-          input.disabled=true;
-          processCommand(cmd);
-        }
-        if(e.ctrlKey && (e.key==="c" || e.key==="C")){
-          appendLine("^C");
-          input.disabled=true;
-          makePrompt();
-        }
-      });
-    }
-
-    function processCommand(raw){
-      appendLine("User@portfolio:~$ "+raw,"small");
-      const cmd=raw.toLowerCase();
-
-      if(PROJECTS[cmd]){
-        openProject(cmd);
+      if(e.ctrlKey && (e.key==="c"||e.key==="C")){
+        appendLine("^C");
+        input.disabled=true;
         makePrompt();
-        return;
       }
+    });
+  }
 
-      switch(cmd){
-        case "help":
-          appendLine("Commands:");
-          appendLine("help, skills, projects, contact, about-me, clear");
-          appendLine("Type a project name to open it");
-          break;
-        case "skills":
-          Object.values(SKILLS).flat().forEach(s=>appendLine(s));
-          break;
-        case "projects":
-          appendLine("Projects:");
-          Object.keys(PROJECTS).forEach(p=>appendLine("- "+p));
-          break;
-        case "contact":
-          appendLine("Email: d3valexstudios@hotmail.com");
-          break;
-        case "about-me":
-          appendLine("Sonny Bolton — Game Developer");
-          appendLine("Focused on Unreal, Unity, and gameplay systems.");
-          break;
-        case "clear":
-          terminal.innerHTML="";
-          break;
-        default:
-          appendLine("Command not found: "+raw);
-      }
+  function processCommand(raw){
+    appendLine("User@portfolio:~$ "+raw,"small");
+    const cmd=raw.toLowerCase();
+
+    if(PROJECTS[cmd]){
+      openProject(cmd);
       makePrompt();
+      return;
     }
 
-    (async function(){
-      await typeText("Initializing portfolio system...");
-      await typeText("Loading modules...");
-      await typeText("System ready.");
-      appendLine("Type 'help' for commands.","small");
-      appendLine();
-      makePrompt();
-    })();
-  </script>
+    switch(cmd){
+      case "help":
+        appendLine("Commands:");
+        appendLine("help, skills, projects, contact, about-me, clear");
+        appendLine("Type a project name to open it");
+        break;
+      case "skills":
+        Object.values(SKILLS).flat().forEach(s=>appendLine(s));
+        break;
+      case "projects":
+        appendLine("Projects:");
+        Object.keys(PROJECTS).forEach(p=>appendLine("- "+p));
+        break;
+      case "contact":
+        appendLine("Email: d3valexstudios@hotmail.com");
+        break;
+      case "about-me":
+        appendLine("Sonny Bolton — Game Developer");
+        appendLine("Focused on Unreal, Unity, and gameplay systems.");
+        break;
+      case "clear":
+        terminal.innerHTML="";
+        break;
+      default:
+        appendLine("Command not found: "+raw);
+    }
+    makePrompt();
+  }
+
+  (async function(){
+    await typeText("Initializing portfolio system...");
+    await typeText("Loading modules...");
+    await typeText("System ready.");
+    appendLine("Type 'help' for commands.","small");
+    appendLine();
+    makePrompt();
+  })();
+</script>
 </body>
 </html>
