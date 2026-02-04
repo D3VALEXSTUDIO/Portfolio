@@ -73,6 +73,9 @@
 <script>
 const terminal = document.getElementById("terminal");
 
+/* =======================
+   PROJECT TEMPLATE SYSTEM
+   ======================= */
 const PROJECTS = {
   "portfolio-website": {
     title: "Portfolio Website",
@@ -89,6 +92,71 @@ const PROJECTS = {
       "- Modular commands",
       "- Responsive terminal layout",
       "- Project pop-up system"
+    ]
+  },
+
+  "esports-discordbot": {
+    title: "Discord Bot for an Esports Server",
+    content: [
+      "Type: Discord Bot",
+      "Tech: Python",
+      "",
+      "Description:",
+      "A Discord bot used to automate server welcomes,",
+      "schedule battles, and manage announcements.",
+      "",
+      "Features:",
+      "- 1v1 Battles",
+      "- Points Shop & Redeem",
+      "- Announcements",
+      "- Leaderboards",
+      "- Points System",
+      "",
+      "GitHub Repo",
+      "https://github.com/Sonny-Bolton/DiscordEsportsBot"
+    ]
+  },
+
+  "business-discordbot": {
+    title: "Discord Bot for my Business Server",
+    content: [
+      "Type: Discord Bot",
+      "Tech: Python",
+      "",
+      "Description:",
+      "A Discord bot used to automate server welcomes,",
+      "schedule playtests, manage announcements, feedbacks, patchnotes.",
+      "",
+      "Features:",
+      "- Schedule Game Playtests",
+      "- Get Feedback",
+      "- Announcements",
+      "- Push out patch notes to my community",
+      "- Community Spotlight shout out a member",
+      "",
+      "GitHub Repo",
+      "https://github.com/Sonny-Bolton/VAL-X-DiscordBot"
+    ]
+  },
+
+  "small-multiplayer-prop-hunt": {
+    title: "Local Multiplayer Prop Hunt",
+    content: [
+      "Type: Multiplayer Prop Hunt",
+      "Tech: Unreal Engine Blueprints",
+      "",
+      "Description:",
+      "I coded and tested a small multiplayer prop hunt game",
+      "using local connections inside the college games hub.",
+      "",
+      "Features:",
+      "- Prop Changing",
+      "- Join and Create Servers",
+      "- Destroying Props",
+      "- Hiders and Seekers",
+      "",
+      "GitHub Repo",
+      "https://github.com/Sonny-Bolton/UnrealEngineLocalMultiplayerPropHunt"
     ]
   },
 
@@ -114,6 +182,37 @@ const PROJECTS = {
   }
 };
 
+const SKILLS = {
+  technical: [
+    "Unreal Engine",
+    "Unity",
+    "C++ / C#",
+    "Gameplay Programming",
+    "Level Design",
+    "Animation Blueprints",
+    "Python",
+    "Web Programming",
+    "Software Programming",
+    "Godot"
+  ],
+  software: [
+    "Blender / 3DS Max",
+    "JavaScript",
+    "Microsoft PowerPoint",
+    "Microsoft Excel",
+    "Trello"
+  ],
+  soft: [
+    "Teamwork",
+    "Problem-Solving",
+    "Creativity",
+    "Leadership"
+  ]
+};
+
+/* =======================
+   TERMINAL HELPERS
+   ======================= */
 function appendLine(text = "", cls = "line") {
   const el = document.createElement("div");
   el.className = cls;
@@ -144,9 +243,147 @@ function typeText(text, speed = 20) {
   });
 }
 
+/* =======================
+   POPUP WINDOW
+   ======================= */
+const modal = document.createElement("div");
+modal.style.cssText = `
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 18px;
+`;
+
+const modalWindow = document.createElement("div");
+modalWindow.style.cssText = `
+  background: var(--popup-bg);
+  border: 1px solid var(--popup-border);
+  width: 600px;
+  max-width: 92%;
+  box-shadow: 0 0 22px var(--popup-shadow);
+  border-radius: 12px;
+  overflow: hidden;
+`;
+
+const modalHeader = document.createElement("div");
+modalHeader.style.cssText = `
+  background: var(--popup-header);
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const modalTitle = document.createElement("span");
+
+const modalClose = document.createElement("span");
+modalClose.textContent = "✕";
+modalClose.style.cursor = "pointer";
+modalClose.onclick = () => modal.style.display = "none";
+
+modalHeader.append(modalTitle, modalClose);
+
+const modalBody = document.createElement("div");
+modalBody.style.cssText = `
+  padding: 14px;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  max-height: 70vh;
+  overflow-y: auto;
+`;
+
+modalWindow.append(modalHeader, modalBody);
+modal.appendChild(modalWindow);
+document.body.appendChild(modal);
+
+function openProject(key) {
+  const p = PROJECTS[key];
+  if (!p) return;
+
+  modalTitle.textContent = p.title;
+
+  modalBody.innerHTML = p.content.map(line =>
+    line.startsWith("http")
+      ? `<a href="${line}" target="_blank" style="color:var(--accent)">${line}</a>`
+      : line
+  ).join("<br>");
+
+  modal.style.display = "flex";
+}
+
+/* =======================
+   TERMINAL INPUT
+   ======================= */
+function makePrompt() {
+  const row = document.createElement("div");
+  row.className = "input-line";
+
+  const p = document.createElement("span");
+  p.className = "prompt";
+  p.textContent = "User@portfolio:~$";
+
+  const input = document.createElement("input");
+  input.className = "cmd";
+
+  row.append(p, input);
+  appendElement(row);
+  input.focus();
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      input.disabled = true;
+      processCommand(input.value.trim());
+    }
+  });
+}
+
+function processCommand(raw) {
+  appendLine("User@portfolio:~$ " + raw, "small");
+  const cmd = raw.toLowerCase();
+
+  if (PROJECTS[cmd]) {
+    openProject(cmd);
+    makePrompt();
+    return;
+  }
+
+  switch (cmd) {
+    case "help":
+      appendLine("help, skills, projects, contact, about-me, clear");
+      break;
+    case "skills":
+      Object.values(SKILLS).flat().forEach(s => appendLine(s));
+      break;
+    case "projects":
+      Object.keys(PROJECTS).forEach(p => appendLine("- " + p));
+      break;
+    case "contact":
+      appendLine("Email: d3valexstudios@hotmail.com");
+      break;
+    case "about-me":
+      appendLine("Sonny Bolton — Game Developer");
+      break;
+    case "clear":
+      terminal.innerHTML = "";
+      break;
+    default:
+      appendLine("Command not found: " + raw);
+  }
+  makePrompt();
+}
+
+/* =======================
+   INIT
+   ======================= */
 (async function () {
   await typeText("Initializing portfolio system...");
+  await typeText("Loading modules...");
   await typeText("System ready.");
+  appendLine("Type 'help' for commands.", "small");
+  makePrompt();
 })();
 </script>
 </body>
